@@ -1,0 +1,40 @@
+---
+- name: Backupper playbook
+  hosts: all_servers
+  become: true
+  become_user: postgres
+
+  tasks:
+    
+    - name: Include host-specific variables
+      include_vars:
+        file: "../inventory/host_vars/{{ inventory_hostname }}.yml"
+    
+    - name: remove old backups 
+      shell: rm -rf /var/lib/postgresql/db_backups/*.sql
+
+    - name: Backup db
+      shell: pg_dump {{ item.db_name }} -U {{ item.db_user }} > /var/lib/postgresql/db_backups/{{ item.db_name }}_backup_$(date +\%Y-\%m-\%d).sql 
+      loop: "{{ databases }}"
+
+    - name: Find all backup files
+      find:
+        paths: /var/lib/postgresql/db_backups
+        file_type: file
+        recurse: yes
+        patterns: "*.sql"
+      register: backup_files
+
+    - name: Send SQL backup files to Telegram group
+      stat:
+        path: "{{ item.path }}"
+      loop: "{{ backup_files.files }}"
+      register: file_stats
+
+    - name: Upload files to Telegram
+      shell: >
+        curl -X POST "https://api.telegram.org/bot<token>/sendDocument" \
+        -F "chat_id=-100123456789" \
+        -F "document=@{{ item.stat.path }}" \
+        -F "caption=Backup of {{ item.stat.path | basename | regex_replace('_backup_.*$', '') }} database from {{ inventory_hostname }} server";
+      loop: "{{ file_stats.results }}"

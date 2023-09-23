@@ -1,0 +1,7 @@
+db_type: postgres
+databases:
+
+    - 
+      db_name: db_name
+      db_user: db_user
+      password:

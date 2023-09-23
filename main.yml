@@ -1,0 +1,15 @@
+---
+- name: Schedule backup playbook using cron
+  hosts: localhost
+  gather_facts: false
+
+  tasks:
+    - name: Create a cron job to run every days at 2:00 AM
+      ansible.builtin.cron:
+        name: "Create a cron job to run every day at 2:00 AM"
+        minute: "0"
+        hour: "2"
+        day: "*"
+        month: "*"
+        weekday: "*"
+        job: "ansible-playbook -i /root/backupme/hosts  /root/backupme/playbooks/backupper.yml"
