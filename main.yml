@@ -6,7 +6,7 @@
   tasks:
     - name: Create a cron job to run every days at 2:00 AM
       ansible.builtin.cron:
-        name: "Create a cron job to run every day at 2:00 AM"
+        name: "My cron job description at every 2:00 AM"
         minute: "0"
         hour: "2"
         day: "*"

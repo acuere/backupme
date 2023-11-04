@@ -1,2 +1,7 @@
+#
+#
+#
+
 [all_servers]
-hostname                    ansible_host=1.1.1.1
+host_ip                    ansible_host=1.1.1.1
+
